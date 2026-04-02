@@ -1,1 +1,16 @@
 @import 'tailwindcss';
+
+@layer base {
+	:root {
+		color-scheme: light dark;
+	}
+
+	html {
+		@apply antialiased;
+	}
+
+	body {
+		@apply bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100;
+		min-height: 100dvh;
+	}
+}
