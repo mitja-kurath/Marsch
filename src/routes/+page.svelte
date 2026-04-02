@@ -121,7 +121,7 @@
 	</main>
 
 	<footer class="site-footer">
-		<span>marsch.app</span>
+		<span>marsch.mitjakurath.ch</span>
 		<a href="https://github.com/mitja-kurath/Marsch" target="_blank" rel="noopener">GitHub</a>
 	</footer>
 
