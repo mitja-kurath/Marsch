@@ -30,7 +30,6 @@ const RENDER_TOLERANCE_M = 10;
 const MAX_API_POINTS = 3000;
 
 export function validateRegion(points: WGS84Coord[]): void {
-	// Check a sample of points across the route
 	const step = Math.max(1, Math.floor(points.length / 10));
 	const samples = points.filter((_, i) => i % step === 0);
 	const allInCh = samples.every(isInSwitzerland);
@@ -103,7 +102,6 @@ export function assembleRoute(
 		};
 	});
 
-	// Ensure markers are ordered by distance along route
 	routeMarkers.sort((a, b) => a.distanceFromStart - b.distanceFromStart);
 
 	// Start/End markers get no break

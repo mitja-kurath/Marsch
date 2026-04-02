@@ -1,16 +1,143 @@
 @import 'tailwindcss';
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,600;0,700;0,900;1,900&display=swap');
 
-@layer base {
+/* ─── Design tokens ──────────────────────────────────────────────────────── */
+:root {
+	--bg: #ffffff;
+	--text: #222222;
+	--text-muted: #666666;
+	--accent: #3e7213;
+	--accent-dark: #224c00;
+	--accent-light: #bae397;
+	--accent-bg: #f0f8e8;
+	--border: #3e7213;
+	--radius: 4px;
+	--max-w: 820px;
+}
+
+/* ─── Reset / base ───────────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+html {
+	font-size: 16px;
+}
+
+body {
+	margin: 0;
+	padding: 0 12px;
+	font-family: 'Inter', sans-serif;
+	color: var(--text);
+	background: var(--bg);
+	-webkit-font-smoothing: antialiased;
+}
+
+a {
+	color: var(--accent);
+	text-decoration: underline;
+	text-underline-offset: 2px;
+}
+
+a:hover {
+	color: var(--accent-dark);
+}
+
+/* ─── Typography ─────────────────────────────────────────────────────────── */
+h1,
+h2,
+h3 {
+	font-weight: 900;
+	color: var(--accent-dark);
+	line-height: 1.1;
+	margin: 0;
+}
+
+/* ─── Form elements ──────────────────────────────────────────────────────── */
+input,
+select,
+textarea,
+button {
+	font-family: inherit;
+	font-size: inherit;
+	border-radius: var(--radius);
+	border: 2px solid var(--border);
+	padding: 0.4rem 0.6rem;
+	color: var(--text);
+	background: var(--bg);
+	outline: 0 solid var(--accent-light);
+	transition:
+		outline-width 80ms,
+		background 60ms,
+		border-color 60ms;
+}
+
+input:focus,
+select:focus,
+textarea:focus,
+button:focus-visible {
+	outline-width: 3px;
+	outline-offset: 1px;
+}
+
+input:disabled,
+button:disabled {
+	opacity: 0.45;
+	cursor: not-allowed;
+}
+
+button {
+	font-weight: 700;
+	color: #fff;
+	background: var(--accent);
+	border-color: var(--accent);
+	cursor: pointer;
+	line-height: 1.4;
+}
+
+button:not(:disabled):hover {
+	background: var(--accent-dark);
+	border-color: var(--accent-dark);
+}
+
+button:not(:disabled):active {
+	background: var(--accent-dark);
+	border-color: var(--accent-dark);
+	outline-width: 3px;
+}
+
+button.ghost {
+	color: var(--accent);
+	background: transparent;
+	border-color: var(--accent);
+}
+
+button.ghost:not(:disabled):hover {
+	background: var(--accent-bg);
+	color: var(--accent-dark);
+	border-color: var(--accent-dark);
+}
+
+/* ─── Layout helpers ─────────────────────────────────────────────────────── */
+.page {
+	max-width: var(--max-w);
+	margin: 0 auto;
+}
+
+/* ─── Print ──────────────────────────────────────────────────────────────── */
+@media print {
 	:root {
-		color-scheme: light dark;
-	}
-
-	html {
-		@apply antialiased;
+		--text: #000;
+		--text-muted: #333;
 	}
 
 	body {
-		@apply bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100;
-		min-height: 100dvh;
+		padding: 0;
+	}
+
+	.noprint {
+		display: none !important;
 	}
 }

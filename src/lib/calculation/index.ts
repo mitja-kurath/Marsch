@@ -19,7 +19,6 @@ export function calculate(route: ProcessedRoute, settings: Settings): RouteCalcu
 		const from = markers[i];
 		const to = markers[i + 1];
 
-		// Slice the points between the two markers
 		const segPoints = points.slice(from.routePointIndex, to.routePointIndex + 1);
 
 		let ascentM = 0;
@@ -51,9 +50,6 @@ export function calculate(route: ProcessedRoute, settings: Settings): RouteCalcu
 		totalWalkingMinutes += legWalkingMinutes;
 		totalBreakMinutes += from.breakMinutes; // break taken *at* the from-marker
 	}
-
-	// Break at last marker is not counted (you don't rest after finishing)
-	// breakMinutes for intermediate markers were already added in the loop above
 
 	return {
 		legs,

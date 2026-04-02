@@ -9,9 +9,7 @@
 	import RouteSummary from '$lib/components/RouteSummary.svelte';
 	import SpeedSettings from '$lib/components/SpeedSettings.svelte';
 
-	onMount(() => {
-		app.hydrate();
-	});
+	onMount(() => app.hydrate());
 
 	let settingsOpen = $state(false);
 
@@ -22,144 +20,339 @@
 </script>
 
 <svelte:head>
-	<title>{t('app.title')} — {t('app.subtitle')}</title>
+	<title>Marsch — Wanderzeit-Planer</title>
 </svelte:head>
 
-<!-- ─── Header ─────────────────────────────────────────────────────────────── -->
-<header class="border-b border-slate-200 bg-white px-4 py-3 shadow-sm dark:border-slate-700 dark:bg-slate-900">
-	<div class="mx-auto flex max-w-7xl items-center justify-between">
-		<div class="flex items-center gap-3">
-			<svg class="h-7 w-7 text-green-600" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-					d="M3 17l4-8 4 4 4-6 4 8" />
-				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-					d="M3 21h18" />
-			</svg>
-			<div>
-				<h1 class="text-lg font-bold leading-none text-slate-900 dark:text-slate-100">
-					{t('app.title')}
-				</h1>
-				<p class="text-xs text-slate-500 dark:text-slate-400">{t('app.subtitle')}</p>
-			</div>
-		</div>
+<div class="page">
+
+	<header class="site-header">
+		<a href="/" class="wordmark" onclick={() => app.reset()}>Marsch</a>
 
 		{#if app.status.type === 'ready'}
-			<div class="flex items-center gap-2">
-				<button
-					class="flex items-center gap-1.5 rounded-lg border border-slate-300 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800"
-					onclick={() => (settingsOpen = !settingsOpen)}
-				>
-					<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-							d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-							d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-					</svg>
-					{t('settings.title')}
+			<nav class="header-actions">
+				<button class="ghost" onclick={() => (settingsOpen = !settingsOpen)}>
+					Einstellungen
 				</button>
-				<button
-					class="flex items-center gap-1.5 rounded-lg border border-slate-300 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800"
-					onclick={handlePrint}
-				>
-					<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-							d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-					</svg>
-					{t('actions.print')}
-				</button>
-				<button
-					class="rounded-lg border border-slate-300 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800"
-					onclick={() => app.reset()}
-				>
-					{t('actions.reset')}
-				</button>
-			</div>
+				<button class="ghost" onclick={handlePrint}>Drucken</button>
+				<button class="ghost" onclick={() => app.reset()}>Neue Route</button>
+			</nav>
 		{/if}
-	</div>
-</header>
+	</header>
 
-<!-- ─── Settings panel (slide-down) ────────────────────────────────────────── -->
-{#if settingsOpen && app.status.type === 'ready'}
-	<div class="border-b border-slate-200 bg-slate-50 px-4 py-4 dark:border-slate-700 dark:bg-slate-800/60">
-		<div class="mx-auto max-w-7xl">
+	{#if settingsOpen && app.status.type === 'ready'}
+		<div class="settings-panel">
 			<SpeedSettings />
 		</div>
-	</div>
-{/if}
+	{/if}
 
-<!-- ─── Main content ────────────────────────────────────────────────────────── -->
-<main class="mx-auto max-w-7xl px-4 py-6">
+	<main>
 
-	<!-- IDLE: upload form -->
-	{#if app.status.type === 'idle'}
-		<div class="mx-auto max-w-2xl pt-8">
-			<FileUpload />
-		</div>
+		{#if app.status.type === 'idle'}
+			<section class="hero">
+				<h1 class="hero-title">Marsch.</h1>
+				<p class="hero-lead">Wandern, einfach geplant.</p>
+				<p class="hero-sub">
+					Lade deine Route hoch — Marsch berechnet automatisch Zeiten,
+					Aufstieg, Abstieg und erstellt eine Marschzeittabelle.
+				</p>
+			</section>
 
-	<!-- LOADING -->
-	{:else if app.status.type === 'loading'}
-		<div class="flex min-h-64 flex-col items-center justify-center gap-4 pt-8">
-			<div
-				class="h-10 w-10 animate-spin rounded-full border-4 border-slate-200 border-t-green-600"
-			></div>
-			<p class="text-slate-600 dark:text-slate-300">{app.status.message}</p>
-		</div>
+			<ol class="steps">
+				<li>
+					<strong>1. Planen</strong>
+					Route auf <a href="https://map.geo.admin.ch" target="_blank" rel="noopener">Swisstopo</a>
+					einzeichnen und Wegpunkte benennen — das kannst du bereits.
+				</li>
+				<li>
+					<strong>2. Exportieren</strong>
+					Route als <em>KML-Datei</em> (Swisstopo) oder <em>GPX-Datei</em>
+					(Komoot, Strava, AllTrails) exportieren.
+				</li>
+				<li>
+					<strong>3. Hochladen</strong>
+					Datei hier hochladen. Marsch berechnet Geschwindigkeit,
+					Auf- und Abstieg, Pausen und Ankunftszeiten.
+				</li>
+			</ol>
 
-	<!-- ERROR -->
-	{:else if app.status.type === 'error'}
-		<div class="mx-auto max-w-xl pt-8">
-			<div class="rounded-xl border border-red-200 bg-red-50 p-6 dark:border-red-800 dark:bg-red-950/30">
-				<div class="flex items-start gap-3">
-					<svg class="mt-0.5 h-5 w-5 shrink-0 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-							d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-					</svg>
-					<div>
-						<p class="font-medium text-red-800 dark:text-red-300">{app.status.message}</p>
-					</div>
-				</div>
-				<div class="mt-4 flex gap-2">
-					<button
-						class="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700"
-						onclick={() => app.reset()}
-					>
-						{t('error.retry')}
-					</button>
+			<div class="upload-section">
+				<FileUpload />
+			</div>
+
+		{:else if app.status.type === 'loading'}
+			<div class="state-center">
+				<div class="spinner"></div>
+				<p class="state-msg">{app.status.message}</p>
+			</div>
+
+		{:else if app.status.type === 'error'}
+			<div class="state-center">
+				<div class="error-box">
+					<p class="error-msg">{app.status.message}</p>
+					<button onclick={() => app.reset()}>Erneut versuchen</button>
 				</div>
 			</div>
-		</div>
 
-	<!-- READY: full results view -->
-	{:else if app.status.type === 'ready' && app.route && app.calculation}
-		{@const route = app.route}
-		{@const calculation = app.calculation}
-		{@const settings = app.settings}
+		{:else if app.status.type === 'ready' && app.route && app.calculation}
+			{@const route = app.route}
+			{@const calculation = app.calculation}
+			{@const settings = app.settings}
 
-		<div class="space-y-6">
-			<!-- Route name -->
-			<h2 class="text-xl font-bold text-slate-800 dark:text-slate-100">{route.name}</h2>
+			<div class="results">
+				<h2 class="route-name">{route.name}</h2>
 
-			<!-- Summary cards -->
-			<RouteSummary {calculation} />
+				<RouteSummary {calculation} />
 
-			<!-- Map + elevation chart -->
-			<div class="grid gap-4 lg:grid-cols-2">
-				<div class="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700" style="height: 420px">
-					<RouteMap {route} />
-				</div>
-				<div class="flex flex-col gap-1 rounded-xl border border-slate-200 p-4 dark:border-slate-700" style="height: 420px">
-					<p class="text-sm font-semibold text-slate-600 dark:text-slate-300">{t('chart.title')}</p>
-					<div class="flex-1">
+				<div class="viz-grid">
+					<div class="map-wrap">
+						<RouteMap {route} />
+					</div>
+					<div class="chart-wrap">
+						<p class="section-label">Höhenprofil</p>
 						<ElevationChart {route} />
 					</div>
 				</div>
-			</div>
 
-			<!-- Table -->
-			<div>
-				<p class="mb-2 text-sm font-semibold text-slate-600 dark:text-slate-300">{t('table.title')}</p>
+				<p class="section-label">Wegpunkte</p>
 				<RouteTable {route} {calculation} {settings} />
 			</div>
-		</div>
-	{/if}
-</main>
+		{/if}
+
+	</main>
+
+	<footer class="site-footer">
+		<span>marsch.app</span>
+		<a href="https://github.com/mitja-kurath/Marsch" target="_blank" rel="noopener">GitHub</a>
+	</footer>
+
+</div>
+
+<style>
+	/* ─── Header ────────────────────────────────────────────────────────────── */
+	.site-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 18px 0 14px;
+		border-bottom: 2px solid var(--accent-light);
+		margin-bottom: 0;
+	}
+
+	.wordmark {
+		font-weight: 900;
+		font-size: 1.25rem;
+		color: var(--accent-dark);
+		text-decoration: none;
+		letter-spacing: -0.02em;
+	}
+
+	.wordmark:hover {
+		color: var(--accent);
+	}
+
+	.header-actions {
+		display: flex;
+		gap: 8px;
+		flex-wrap: wrap;
+	}
+
+	.header-actions button {
+		font-size: 0.875rem;
+		padding: 0.3rem 0.7rem;
+	}
+
+	/* ─── Settings panel ────────────────────────────────────────────────────── */
+	.settings-panel {
+		border-bottom: 2px solid var(--accent-light);
+		background: var(--accent-bg);
+		padding: 20px 0;
+		margin-bottom: 0;
+	}
+
+	/* ─── Hero ──────────────────────────────────────────────────────────────── */
+	.hero {
+		padding: 52px 0 32px;
+		text-align: center;
+	}
+
+	.hero-title {
+		font-size: clamp(3rem, 10vw, 5.5rem);
+		font-style: italic;
+		color: var(--accent-dark);
+		letter-spacing: -0.03em;
+		line-height: 1;
+	}
+
+	.hero-lead {
+		font-size: 1.2rem;
+		font-weight: 700;
+		color: var(--accent-dark);
+		margin: 10px 0 6px;
+	}
+
+	.hero-sub {
+		font-size: 0.95rem;
+		color: var(--text-muted);
+		max-width: 480px;
+		margin: 0 auto;
+		line-height: 1.55;
+	}
+
+	/* ─── Steps ─────────────────────────────────────────────────────────────── */
+	.steps {
+		list-style: none;
+		padding: 0;
+		margin: 36px 0;
+		display: flex;
+		flex-direction: column;
+		gap: 0;
+		border: 2px solid var(--accent-light);
+		border-radius: var(--radius);
+		overflow: hidden;
+	}
+
+	.steps li {
+		padding: 14px 18px;
+		font-size: 0.92rem;
+		line-height: 1.5;
+		border-bottom: 1px solid var(--accent-light);
+		color: var(--text-muted);
+	}
+
+	.steps li:last-child {
+		border-bottom: none;
+	}
+
+	.steps li strong {
+		display: block;
+		font-weight: 700;
+		color: var(--text);
+		margin-bottom: 2px;
+	}
+
+	/* ─── Upload section ────────────────────────────────────────────────────── */
+	.upload-section {
+		margin-bottom: 52px;
+	}
+
+	/* ─── States ────────────────────────────────────────────────────────────── */
+	.state-center {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		min-height: 260px;
+		gap: 16px;
+	}
+
+	.spinner {
+		width: 36px;
+		height: 36px;
+		border: 3px solid var(--accent-light);
+		border-top-color: var(--accent);
+		border-radius: 50%;
+		animation: spin 0.7s linear infinite;
+	}
+
+	@keyframes spin {
+		to { transform: rotate(360deg); }
+	}
+
+	.state-msg {
+		font-size: 0.95rem;
+		color: var(--text-muted);
+	}
+
+	.error-box {
+		border: 2px solid #c0392b;
+		border-radius: var(--radius);
+		padding: 20px 24px;
+		max-width: 480px;
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+	}
+
+	.error-msg {
+		color: #c0392b;
+		font-size: 0.95rem;
+		margin: 0;
+		line-height: 1.5;
+	}
+
+	.error-box button {
+		background: #c0392b;
+		border-color: #c0392b;
+		align-self: flex-start;
+	}
+
+	.error-box button:hover {
+		background: #96281b;
+		border-color: #96281b;
+	}
+
+	/* ─── Results ───────────────────────────────────────────────────────────── */
+	.results {
+		padding: 28px 0 52px;
+		display: flex;
+		flex-direction: column;
+		gap: 28px;
+	}
+
+	.route-name {
+		font-size: 1.6rem;
+		letter-spacing: -0.02em;
+	}
+
+	.viz-grid {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 16px;
+	}
+
+	@media (max-width: 600px) {
+		.viz-grid {
+			grid-template-columns: 1fr;
+		}
+	}
+
+	.map-wrap {
+		height: 380px;
+		border: 2px solid var(--accent-light);
+		border-radius: var(--radius);
+		overflow: hidden;
+	}
+
+	.chart-wrap {
+		height: 380px;
+		border: 2px solid var(--accent-light);
+		border-radius: var(--radius);
+		padding: 16px;
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+	}
+
+	.chart-wrap > :last-child {
+		flex: 1;
+	}
+
+	.section-label {
+		font-size: 0.8rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+		color: var(--text-muted);
+		margin: 0;
+	}
+
+	/* ─── Footer ────────────────────────────────────────────────────────────── */
+	.site-footer {
+		border-top: 2px solid var(--accent-light);
+		padding: 14px 0;
+		display: flex;
+		gap: 16px;
+		font-size: 0.8rem;
+		color: var(--text-muted);
+	}
+</style>

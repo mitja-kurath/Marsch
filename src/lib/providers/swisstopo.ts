@@ -12,7 +12,7 @@ import type { ElevationProfile } from '$lib/processing/pipeline';
 import { wgs84ToLv95, haversineDistance } from '$lib/processing/coordinates';
 import { simplify } from '$lib/processing/simplify';
 
-const PROFILE_URL = 'https://api3.geo.admin.ch/rest/services/profile.json';
+const PROFILE_URL = '/api/elevation';
 
 /** Number of elevation points to request from the API. */
 const NB_POINTS = 500;
@@ -34,7 +34,6 @@ type ProfilePoint = {
  * interpolated from the API response.
  */
 export async function fetchElevationProfile(routePoints: WGS84Coord[]): Promise<ElevationProfile> {
-	// Reduce to API limits if necessary
 	const simplified =
 		routePoints.length > MAX_INPUT_COORDS ? simplify(routePoints, 20) : routePoints;
 
@@ -51,7 +50,11 @@ export async function fetchElevationProfile(routePoints: WGS84Coord[]): Promise<
 		distinct_points: 'true'
 	});
 
-	const response = await fetch(`${PROFILE_URL}?${params.toString()}`);
+	const response = await fetch(PROFILE_URL, {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+		body: params.toString()
+	});
 	if (!response.ok) {
 		throw new Error(`Swisstopo API ${response.status}: ${response.statusText}`);
 	}

@@ -54,11 +54,12 @@
 
 	onMount(() => {
 		(async () => {
-			const { Chart, LineElement, PointElement, LinearScale, CategoryScale, Filler, Tooltip } =
+			const { Chart, LineController, LineElement, PointElement, LinearScale, CategoryScale, Filler, Tooltip } =
 				await import('chart.js');
 			const annotationPlugin = (await import('chartjs-plugin-annotation')).default;
 
 			Chart.register(
+				LineController,
 				LineElement,
 				PointElement,
 				LinearScale,

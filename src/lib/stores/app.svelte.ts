@@ -14,7 +14,6 @@ class AppStore {
 	status = $state<AppStatus>({ type: 'idle' });
 	settings = $state<Settings>({ ...DEFAULT_SETTINGS });
 
-	/** Recalculate whenever route or settings change. */
 	recalculate() {
 		if (this.route) {
 			this.calculation = calculate(this.route, this.settings);
@@ -102,7 +101,6 @@ class AppStore {
 		}
 	}
 
-	/** Snapshot for print page. */
 	snapshotForPrint(): { route: ProcessedRoute; calculation: RouteCalculation; settings: Settings } | null {
 		if (!this.route || !this.calculation) return null;
 		return {

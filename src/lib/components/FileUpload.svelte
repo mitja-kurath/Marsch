@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { t } from '$lib/i18n';
 	import { parseFile } from '$lib/parsing';
 	import { validateRegion, prepareForApi, assembleRoute } from '$lib/processing/pipeline';
 	import { fetchElevationProfile } from '$lib/providers/swisstopo';
 	import { app } from '$lib/stores/app.svelte';
+	import { t } from '$lib/i18n';
 
 	let dragging = $state(false);
 	let fileInput: HTMLInputElement;
@@ -25,23 +25,14 @@
 			app.setReady(route);
 		} catch (err) {
 			const msg = err instanceof Error ? err.message : String(err);
-
-			if (msg === 'no-route') {
-				app.setError(t('upload.error.noRoute'));
-			} else if (msg === 'too-few-points') {
-				app.setError(t('upload.error.tooFewPoints'));
-			} else if (msg === 'outside-switzerland') {
-				app.setError(t('upload.error.outsideSwitzerland'));
-			} else if (msg.startsWith('invalid-format:')) {
-				const ext = msg.split(':')[1];
-				app.setError(t('upload.error.invalidFormat', { ext }));
-			} else if (msg.startsWith('no-markers')) {
-				app.setError(t('upload.error.noMarkers'));
-			} else if (msg.includes('Swisstopo') || msg.includes('Empty elevation')) {
+			if (msg === 'no-route') app.setError(t('upload.error.noRoute'));
+			else if (msg === 'too-few-points') app.setError(t('upload.error.tooFewPoints'));
+			else if (msg === 'outside-switzerland') app.setError(t('upload.error.outsideSwitzerland'));
+			else if (msg.startsWith('invalid-format:'))
+				app.setError(t('upload.error.invalidFormat', { ext: msg.split(':')[1] }));
+			else if (msg.includes('Swisstopo') || msg.includes('Empty elevation'))
 				app.setError(t('error.elevationApi'));
-			} else {
-				app.setError(t('upload.error.parseError', { message: msg }));
-			}
+			else app.setError(t('upload.error.parseError', { message: msg }));
 		}
 	}
 
@@ -52,71 +43,96 @@
 	}
 
 	function onFileChange(e: Event) {
-		const input = e.target as HTMLInputElement;
-		const file = input.files?.[0];
+		const file = (e.target as HTMLInputElement).files?.[0];
 		if (file) processFile(file);
 	}
 </script>
 
 <div
+	class="drop-zone {dragging ? 'dragging' : ''}"
 	role="button"
 	tabindex="0"
-	class="flex min-h-64 cursor-pointer flex-col items-center justify-center gap-4 rounded-2xl border-2 border-dashed p-10 transition-colors {dragging
-		? 'border-green-500 bg-green-50 dark:bg-green-950/20'
-		: 'border-slate-300 hover:border-green-400 hover:bg-slate-50 dark:border-slate-600 dark:hover:border-green-500 dark:hover:bg-slate-800/50'}"
-	ondragover={(e) => {
-		e.preventDefault();
-		dragging = true;
-	}}
+	ondragover={(e) => { e.preventDefault(); dragging = true; }}
 	ondragleave={() => (dragging = false)}
-	ondrop={(e) => {
-		e.preventDefault();
-		onDrop(e);
-	}}
+	ondrop={(e) => { e.preventDefault(); onDrop(e); }}
 	onclick={() => fileInput.click()}
 	onkeydown={(e) => e.key === 'Enter' && fileInput.click()}
 >
-	<!-- Upload icon -->
-	<svg
-		class="h-14 w-14 {dragging ? 'text-green-500' : 'text-slate-400'}"
-		fill="none"
-		stroke="currentColor"
-		viewBox="0 0 24 24"
-	>
-		<path
-			stroke-linecap="round"
-			stroke-linejoin="round"
-			stroke-width="1.5"
-			d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"
-		/>
+	<svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+		<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+			d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
 	</svg>
 
-	<div class="text-center">
-		<p class="text-lg font-semibold text-slate-700 dark:text-slate-200">
-			{t('upload.title')}
-		</p>
-		<p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
-			{t('upload.description')}
-		</p>
-	</div>
+	<p class="drop-label">Route hochladen</p>
+	<p class="drop-hint">KML- oder GPX-Datei hier ablegen</p>
 
 	<button
-		class="rounded-lg bg-green-600 px-5 py-2 text-sm font-medium text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
-		onclick={(e) => {
-			e.stopPropagation();
-			fileInput.click();
-		}}
+		onclick={(e) => { e.stopPropagation(); fileInput.click(); }}
 	>
-		{t('upload.button')}
+		Datei auswählen
 	</button>
 
-	<p class="text-xs text-slate-400 dark:text-slate-500">{t('upload.supportedFormats')}</p>
+	<p class="format-note">KML (Swisstopo) · GPX (Komoot, Strava, AllTrails)</p>
 </div>
 
 <input
 	bind:this={fileInput}
 	type="file"
 	accept=".kml,.gpx"
-	class="hidden"
+	style="display:none"
 	onchange={onFileChange}
 />
+
+<style>
+	.drop-zone {
+		border: 2px dashed var(--accent-light);
+		border-radius: var(--radius);
+		padding: 40px 24px;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 10px;
+		cursor: pointer;
+		transition: border-color 120ms, background 120ms;
+		text-align: center;
+	}
+
+	.drop-zone:hover,
+	.drop-zone:focus-visible {
+		border-color: var(--accent);
+		background: var(--accent-bg);
+		outline: none;
+	}
+
+	.drop-zone.dragging {
+		border-color: var(--accent);
+		border-style: solid;
+		background: var(--accent-bg);
+	}
+
+	.upload-icon {
+		width: 40px;
+		height: 40px;
+		color: var(--accent);
+		opacity: 0.7;
+	}
+
+	.drop-label {
+		font-weight: 700;
+		font-size: 1rem;
+		color: var(--text);
+		margin: 0;
+	}
+
+	.drop-hint {
+		font-size: 0.875rem;
+		color: var(--text-muted);
+		margin: 0;
+	}
+
+	.format-note {
+		font-size: 0.75rem;
+		color: var(--text-muted);
+		margin: 0;
+	}
+</style>
