@@ -105,7 +105,7 @@
 
 				<div class="viz-grid">
 					<div class="map-wrap">
-						<RouteMap {route} />
+						<RouteMap {route} highlightIndex={app.hoveredMarkerIndex} />
 					</div>
 					<div class="chart-wrap">
 						<p class="section-label">Höhenprofil</p>

@@ -13,6 +13,7 @@ class AppStore {
 	calculation = $state<RouteCalculation | null>(null);
 	status = $state<AppStatus>({ type: 'idle' });
 	settings = $state<Settings>({ ...DEFAULT_SETTINGS });
+	hoveredMarkerIndex = $state<number | null>(null);
 
 	recalculate() {
 		if (this.route) {

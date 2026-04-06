@@ -38,7 +38,11 @@
 		<tbody>
 			{#each route.markers as marker, i}
 				{@const leg = calculation.legs[i - 1]}
-				<tr>
+				<tr
+					onmouseenter={() => (app.hoveredMarkerIndex = i)}
+					onmouseleave={() => (app.hoveredMarkerIndex = null)}
+					class:hovered={app.hoveredMarkerIndex === i}
+				>
 					<td class="col-name">
 						{#if editingName === marker.id}
 							<input
@@ -158,6 +162,7 @@
 
 	tbody tr:last-child td { border-bottom: none; }
 	tbody tr:hover td { background: var(--accent-bg); }
+	tbody tr.hovered td { background: var(--accent-bg); outline: none; }
 
 	.totals-row td {
 		border-top: 2px solid var(--accent-light);
